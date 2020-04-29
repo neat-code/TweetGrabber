@@ -21,7 +21,6 @@
                 .AddSingleton<ITweetRepository, TweetRepository>()
                 .AddSingleton<ITweetSqlDatabase, CosmosTweetSqlDatabase>()
                 .AddSingleton<ITweetAdapter, TweetAdapter>()
-                .AddSingleton<ITweetGraphDatabase, TweetGraphDatabase>()
                 .BuildServiceProvider();
 
             serviceProvider.GetService<IApplication>().Run();

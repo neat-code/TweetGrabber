@@ -9,7 +9,5 @@
         Task<IEnumerable<TwitterSubject>> GetActiveSubjects();
 
         Task InsertTweet(TweetDbObject tweetDbObject);
-
-        void CreateGraph(string collectionName);
     }
 }

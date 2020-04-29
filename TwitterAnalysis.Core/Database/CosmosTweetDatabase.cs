@@ -16,14 +16,12 @@
         private readonly CosmosClient client;
         private readonly Database database;
         private readonly Container container;
-        private readonly ITweetGraphDatabase tweetGraphDatabase;
 
-        public CosmosTweetSqlDatabase(IConfiguration configuration, ITweetGraphDatabase tweetGraphDatabase)
+        public CosmosTweetSqlDatabase(IConfiguration configuration)
         {
             client = new CosmosClient(configuration["CosmosConnection"]);
             database = client.GetDatabase("TwitterAnalysis");
             container = database.GetContainer("tweets");
-            this.tweetGraphDatabase = tweetGraphDatabase;
         }
 
         public async Task<IEnumerable<TwitterSubject>> GetActiveSubjects()
@@ -55,29 +53,6 @@
         public async Task InsertTweet(TweetDbObject tweetDbObject)
         {
             await container.CreateItemAsync(tweetDbObject);
-        }
-
-        public void CreateGraph(string collectionName)
-        {
-
-            QueryRequestOptions queryRequestOptions = new QueryRequestOptions
-            {
-                EnableScanInQuery = true,
-            };
-
-            var iterator = container.GetItemQueryIterator<TweetDbObject>("select * from c", null, queryRequestOptions);
-
-
-            while (iterator.HasMoreResults)
-            {
-                var results = iterator.ReadNextAsync().Result;
-                foreach (var document in results)
-                {
-                    var result = JsonConvert.DeserializeObject<TweetWrapper>(document.Tweet.ToString());
-                    tweetGraphDatabase.InsertTweet(result.TweetDTO).Wait();
-                    Console.WriteLine("Found one more batch of documents");
-                }
-            }
         }
     }
 }
